@@ -1,0 +1,2 @@
+- adicionar uma entidade para representa o retrabalho de uma peça
+- adicionar uma tabela para indicar o descarte
