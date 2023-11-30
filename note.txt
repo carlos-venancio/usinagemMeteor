@@ -1,0 +1,10 @@
+modelagem
+documentação (dicionario) do banco
+ddl
+dml
+
+
+INFORMATION_SCHEMA.TABLES => tabela que contém todas as tabelas do banco
+IGNORE => ignora caso dê erro
+
+EXPLAIN

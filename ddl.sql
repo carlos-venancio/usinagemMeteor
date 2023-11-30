@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS parts(
     description			VARCHAR(200) NOT NULL,
     weight				DECIMAL(10,2) NOT NULL,			
     height				DECIMAL(10,2) NOT NULL,
-    lenght				DECIMAL(10,2) NOT NULL,
+    len				DECIMAL(10,2) NOT NULL,
     measurement         ENUM('metro','milimetro','centimetro'),
     fk_rawMaterialId		INT NOT NULL,
     
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS machine(
     description 		VARCHAR(200) NOT NULL,			
     max_capacity		INT NOT NULL,
     lastMaintenance		DATE NOT NULL,
+    status 				ENUM('funcionando','quebrada'),
     
     PRIMARY KEY (pk_machineId)
 );
@@ -69,7 +70,7 @@ CREATE TABLE IF NOT EXISTS productionOrder(
 	amount					INT NOT NULL,
 	startDate				DATETIME NOT NULL,
 	endDate					DATETIME NOT NULL,
-	status					VARCHAR(30) DEFAULT 'INCOMPLETO',
+	status					VARCHAR(30) DEFAULT 'FAZER',
 	lote					VARCHAR(100) NOT NULL,
     
     PRIMARY KEY (pk_productionOrderId),
@@ -133,9 +134,9 @@ CREATE TABLE IF NOT EXISTS maintenanceHistory(
 CREATE TABLE IF NOT EXISTS inspection(
 	pk_inspectionId         			INT AUTO_INCREMENT,
 	observations	                    VARCHAR(300),	
-	date			            		DATETIME,
+	date			            		DATE,
 	fk_productionOrderId				INT,
-    result                      		ENUM('APROVADO','REPROVADO'),
+    result                      		ENUM('aprovado','reprovado', 'andamento'),
     
     PRIMARY KEY (pk_inspectionId),
     FOREIGN KEY (fk_productionOrderId) REFERENCES productionOrder(pk_productionOrderId)
@@ -144,7 +145,7 @@ CREATE TABLE IF NOT EXISTS inspection(
 CREATE TABLE IF NOT EXISTS acceptance(
 	pk_acceptanceId             INT AUTO_INCREMENT,
 	observations	            VARCHAR(300),	
-	date			            DATETIME,
+	date			            DATE,
     fk_inspectionId             INT,
     destination                 VARCHAR(150),
 
@@ -155,7 +156,7 @@ CREATE TABLE IF NOT EXISTS acceptance(
 CREATE TABLE IF NOT EXISTS rejection(
 	pk_rejectionId              INT AUTO_INCREMENT,
 	reason	                    VARCHAR(300),	
-	date			            DATETIME,
+	date			            DATE,
     fk_inspectionId             INT,
     correctiveActions           VARCHAR(150),
 
