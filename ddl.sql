@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS rawMaterial(
     fk_provider			INT NOT NULL,
     
     PRIMARY KEY (pk_rawMaterialId),
-    FOREIGN KEY (fk_provider) REFERENCES provider (pk_provider)
+    FOREIGN KEY (fk_provider) REFERENCES provider (pk_provider) ON DELETE CASCADE
 );
 
 -- CONTROLE DE PRODUÇÃO
@@ -31,12 +31,13 @@ CREATE TABLE IF NOT EXISTS parts(
     description			VARCHAR(200) NOT NULL,
     weight				DECIMAL(10,2) NOT NULL,			
     height				DECIMAL(10,2) NOT NULL,
-    len				DECIMAL(10,2) NOT NULL,
+    len					DECIMAL(10,2) NOT NULL,
     measurement         ENUM('metro','milimetro','centimetro'),
-    fk_rawMaterialId		INT NOT NULL,
+    fk_rawMaterialId	INT NOT NULL,
+    width				DECIMAL(10,2) NOT NULL,
     
     PRIMARY KEY (pk_partsId),
-    FOREIGN KEY (fk_rawMaterialId) REFERENCES rawMaterial (pk_rawMaterialId)
+    FOREIGN KEY (fk_rawMaterialId) REFERENCES rawMaterial (pk_rawMaterialId) ON DELETE CASCADE
 );
 
 
@@ -74,7 +75,7 @@ CREATE TABLE IF NOT EXISTS productionOrder(
 	lote					VARCHAR(100) NOT NULL,
     
     PRIMARY KEY (pk_productionOrderId),
-    FOREIGN KEY (fk_partsID) REFERENCES parts(pk_partsID)
+    FOREIGN KEY (fk_partsID) REFERENCES parts(pk_partsID) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS productionSchedule(
@@ -86,9 +87,9 @@ CREATE TABLE IF NOT EXISTS productionSchedule(
 	endDateTime				DATETIME,
     
     PRIMARY KEY (pk_productionScheduleId),
-    FOREIGN KEY (fk_operatorId) REFERENCES operator(pk_operatorId),
-    FOREIGN KEY (fk_productionOrderId) REFERENCES productionOrder(pk_productionOrderId),
-    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId)
+    FOREIGN KEY (fk_operatorId) REFERENCES operator(pk_operatorId) ON DELETE CASCADE,
+    FOREIGN KEY (fk_productionOrderId) REFERENCES productionOrder(pk_productionOrderId) ON DELETE CASCADE,
+    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId) ON DELETE CASCADE
 );
 
 -- MANUTENÇÃO DE EQUIPAMENTOS
@@ -103,7 +104,7 @@ CREATE TABLE IF NOT EXISTS equipment(
 	fk_machineId			INT,
     
     PRIMARY KEY (pk_euipmentId),
-    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId)
+    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS scheduledMaintenance(
@@ -114,7 +115,7 @@ CREATE TABLE IF NOT EXISTS scheduledMaintenance(
 	responsible				    	VARCHAR(100),
     
     PRIMARY KEY (pk_scheduledMaintenanceId),
-	FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId)
+	FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS maintenanceHistory(
@@ -122,10 +123,10 @@ CREATE TABLE IF NOT EXISTS maintenanceHistory(
 	fk_machineId	                INT,	
 	date			            	DATETIME,
 	type			            	ENUM('preventiva', 'preditiva','corretiva','parada','baesada no tempo'),
-	costs				    DECIMAL(10,2),
+	costs				    		DECIMAL(10,2),
     
     PRIMARY KEY (pk_maintenanceHistoryId),
-    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId)
+    FOREIGN KEY (fk_machineId) REFERENCES machine(pk_machineId) ON DELETE CASCADE
 );
 
 
@@ -139,29 +140,27 @@ CREATE TABLE IF NOT EXISTS inspection(
     result                      		ENUM('aprovado','reprovado', 'andamento'),
     
     PRIMARY KEY (pk_inspectionId),
-    FOREIGN KEY (fk_productionOrderId) REFERENCES productionOrder(pk_productionOrderId)
+    FOREIGN KEY (fk_productionOrderId) REFERENCES productionOrder(pk_productionOrderId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS acceptance(
-	pk_acceptanceId             INT AUTO_INCREMENT,
+	pk_inspectionId             INT AUTO_INCREMENT,
 	observations	            VARCHAR(300),	
 	date			            DATE,
-    fk_inspectionId             INT,
     destination                 VARCHAR(150),
 
-    PRIMARY KEY (pk_acceptanceId),
-    FOREIGN KEY (fk_inspectionId) REFERENCES inspection(pk_inspectionId)
+    PRIMARY KEY (pk_inspectionId),
+    FOREIGN KEY (pk_inspectionId) REFERENCES inspection(pk_inspectionId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS rejection(
-	pk_rejectionId              INT AUTO_INCREMENT,
+	pk_inspectionId              INT AUTO_INCREMENT,
 	reason	                    VARCHAR(300),	
 	date			            DATE,
-    fk_inspectionId             INT,
     correctiveActions           VARCHAR(150),
 
-    PRIMARY KEY (pk_rejectionId),
-    FOREIGN KEY (fk_inspectionId) REFERENCES inspection(pk_inspectionId)
+    PRIMARY KEY (pk_inspectionId),
+    FOREIGN KEY (pk_inspectionId) REFERENCES inspection(pk_inspectionId) ON DELETE CASCADE
 );
 
 SELECT COUNT(*) 
